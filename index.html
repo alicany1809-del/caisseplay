@@ -10,32 +10,53 @@
             --m-100: #2ecc71; --m-50: #e67e22; --m-20: #3498db;
             --m-10: #e74c3c; --m-5: #95a5a6; --m-gold: #f1c40f;
             --m-bronze: #d35400; --stroke: #1a252f;
+            --btn-reset: #9b59b6; /* Violet pour le bouton recommencer */
         }
         * { font-size: 1.2rem !important; font-weight: 800; box-sizing: border-box; touch-action: manipulation; }
         html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background: var(--bg-app); }
         body { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; padding: 10px; color: white; position: relative; }
+        
         #game-container { display: flex; flex-direction: column; gap: 8px; height: 100%; }
-        #top-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; flex-shrink: 0; padding-right: 45px; }
+        
+        /* Layout du haut avec bouton reset intégré */
+        #header-top { display: flex; gap: 8px; align-items: stretch; flex-shrink: 0; }
+        #top-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; flex-grow: 1; }
+
         .info-card { background: #ffffff; padding: 5px; border-radius: 12px; text-align: center; }
-        .info-card label { display: block; color: #7f8c8d; font-size: 0.7rem !important; }
-        .info-card span { display: block; color: #2c3e50; font-size: 1.2rem !important; }
+        .info-card label { display: block; color: #7f8c8d; font-size: 0.6rem !important; text-transform: uppercase; }
+        .info-card span { display: block; color: #2c3e50; font-size: 1.1rem !important; }
+
+        /* Style du bouton actualiser identique aux autres */
+        .btn-reset { 
+            background: var(--btn-reset); color: white; border: none; border-radius: 12px;
+            width: 55px; box-shadow: 0 4px 0 #8e44ad; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem !important;
+        }
+        .btn-reset:active { transform: translateY(2px); box-shadow: 0 2px 0 #8e44ad; }
+
         #plateau-zone { flex-grow: 1; background: var(--plateau); border-radius: 15px; position: relative; overflow: hidden; border: 3px solid #bdc3c7; }
         #header-step { background: white; padding: 6px; text-align: center; color: var(--sidebar); font-size: 1rem !important; border-bottom: 2px solid #eee; }
+        
         #numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .num-btn, .money-btn { padding: 12px 0; border: none; border-radius: 8px; background: white; color: var(--sidebar); cursor: pointer; box-shadow: 0 4px 0 #bdc3c7; position: relative; }
         .num-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #bdc3c7; }
+        
         .btn-check { background: #2ecc71; color: white; box-shadow: 0 4px 0 #27ae60; }
         .btn-clear { background: #e74c3c; color: white; box-shadow: 0 4px 0 #c0392b; }
+        
         #drawer { display: none; padding: 5px 0; }
         .drawer-row { display: flex; gap: 5px; margin-bottom: 5px; }
-        .money-btn { border: 2px solid var(--stroke); color: white; box-shadow: 0 3px 0 var(--stroke); flex: 1; }
+        .money-btn { border: 2px solid var(--stroke); color: white; box-shadow: 0 3px 0 var(--stroke); flex: 1; font-size: 0.9rem !important; }
+        
         .money-item { position: absolute; display: flex; align-items: center; justify-content: center; border: 3px solid var(--stroke); z-index: 10; touch-action: none; }
         .m-billet { width: 90px; height: 45px; border-radius: 8px; }
         .m-piece { border-radius: 50%; color: var(--stroke); width: 50px; height: 50px; }
+        
         .c-100 { background: var(--m-100); } .c-50 { background: var(--m-50); } .c-20 { background: var(--m-20); } 
         .c-10 { background: var(--m-10); } .c-5 { background: var(--m-5); } .c-gold { background: var(--m-gold); }
         .c-silver { background: #ecf0f1; border-color: #7f8c8d; } .c-2e-ring { background: #ecf0f1; border: 4px solid #f1c40f !important; }
         .c-bronze { background: var(--m-bronze); color: white; }
+        
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
         .shake { animation: shake 0.4s ease; }
         #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; visibility: hidden; opacity: 0; transition: opacity 0.4s; }
@@ -44,13 +65,14 @@
 </head>
 <body>
 
-<button onclick="init()" style="position: absolute; top: 10px; right: 10px; z-index: 100; background: rgba(255,255,255,0.3); border: none; border-radius: 50%; width: 45px; height: 45px; color: white; font-size: 1.5rem !important; display: flex; align-items: center; justify-content: center;">🔄</button>
-
 <div id="game-container">
-    <div id="top-info">
-        <div class="info-card"><label>A PAYER</label><span id="val-ticket">0.00</span></div>
-        <div class="info-card"><label>REÇU</label><span id="val-recu">0.00</span></div>
-        <div class="info-card"><label>A RENDRE</label><span id="val-rendre">0.00</span></div>
+    <div id="header-top">
+        <div id="top-info">
+            <div class="info-card"><label>A PAYER</label><span id="val-ticket">0.00</span></div>
+            <div class="info-card"><label>REÇU</label><span id="val-recu">0.00</span></div>
+            <div class="info-card"><label>A RENDRE</label><span id="val-rendre">0.00</span></div>
+        </div>
+        <button class="btn-reset" onclick="init()">🔄</button>
     </div>
 
     <div id="plateau-zone">
@@ -156,9 +178,10 @@
     function update() { 
         document.getElementById('val-ticket').innerText = (game.ticket/100).toFixed(2); 
         document.getElementById('val-recu').innerText = (parseInt(game.input||0)/100).toFixed(2); 
-        // Affiche ce qui RESTE à rendre quand on est à l'étape du rendu
-        let aRendre = (game.received - game.ticket);
-        document.getElementById('val-rendre').innerText = (game.step >= 4) ? ((aRendre - game.userRendu)/100).toFixed(2) : "0.00";
+        
+        // CORRECTION : A RENDRE affiche maintenant la cible fixe à atteindre
+        let cibleARendre = (game.received - game.ticket);
+        document.getElementById('val-rendre').innerText = (game.step >= 4) ? (cibleARendre/100).toFixed(2) : "0.00";
     }
 
     function check() {
@@ -192,7 +215,7 @@
         update(); 
     }
     
-    function addRendu(m) { game.userRendu += m.v; spawn(m); update(); }
+    function addRendu(m) { game.userRendu += m.v; spawn(m); }
     
     buildDrawer(); init();
 </script>
