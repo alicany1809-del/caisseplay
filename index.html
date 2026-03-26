@@ -11,100 +11,40 @@
             --m-10: #e74c3c; --m-5: #95a5a6; --m-gold: #f1c40f;
             --m-bronze: #d35400; --stroke: #1a252f;
         }
-
         * { font-size: 1.2rem !important; font-weight: 800; box-sizing: border-box; touch-action: manipulation; }
-
-        /* Fix : On utilise 100% de la hauteur disponible sans forcer le scroll */
-        html, body { 
-            height: 100%; 
-            margin: 0; 
-            padding: 0; 
-            overflow: hidden; 
-            background: var(--bg-app);
-        }
-
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            display: flex; 
-            flex-direction: column; 
-            padding: 10px; 
-            color: white; 
-        }
-
-        #game-container { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 8px; 
-            height: 100%; 
-        }
-
-        #top-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; flex-shrink: 0; }
-
-        .info-card { 
-            background: #ffffff; padding: 5px; border-radius: 12px; text-align: center; 
-        }
+        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background: var(--bg-app); }
+        body { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; padding: 10px; color: white; position: relative; }
+        #game-container { display: flex; flex-direction: column; gap: 8px; height: 100%; }
+        #top-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; flex-shrink: 0; padding-right: 45px; }
+        .info-card { background: #ffffff; padding: 5px; border-radius: 12px; text-align: center; }
         .info-card label { display: block; color: #7f8c8d; font-size: 0.7rem !important; }
         .info-card span { display: block; color: #2c3e50; font-size: 1.2rem !important; }
-
-        #plateau-zone { 
-            flex-grow: 1; 
-            background: var(--plateau); 
-            border-radius: 15px; 
-            position: relative; 
-            overflow: hidden; 
-            border: 3px solid #bdc3c7;
-        }
-
+        #plateau-zone { flex-grow: 1; background: var(--plateau); border-radius: 15px; position: relative; overflow: hidden; border: 3px solid #bdc3c7; }
         #header-step { background: white; padding: 6px; text-align: center; color: var(--sidebar); font-size: 1rem !important; border-bottom: 2px solid #eee; }
-
-        #interactive-bottom { flex-shrink: 0; }
-
         #numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-
-        .num-btn, .money-btn { 
-            padding: 12px 0; border: none; border-radius: 8px; background: white; 
-            color: var(--sidebar); cursor: pointer; box-shadow: 0 4px 0 #bdc3c7; 
-            position: relative; text-align: center;
-        }
+        .num-btn, .money-btn { padding: 12px 0; border: none; border-radius: 8px; background: white; color: var(--sidebar); cursor: pointer; box-shadow: 0 4px 0 #bdc3c7; position: relative; }
         .num-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #bdc3c7; }
-
         .btn-check { background: #2ecc71; color: white; box-shadow: 0 4px 0 #27ae60; }
         .btn-clear { background: #e74c3c; color: white; box-shadow: 0 4px 0 #c0392b; }
-
         #drawer { display: none; padding: 5px 0; }
         .drawer-row { display: flex; gap: 5px; margin-bottom: 5px; }
         .money-btn { border: 2px solid var(--stroke); color: white; box-shadow: 0 3px 0 var(--stroke); flex: 1; }
-
-        .money-item { 
-            position: absolute; display: flex; align-items: center; justify-content: center; 
-            border: 3px solid var(--stroke); z-index: 10; touch-action: none;
-        }
+        .money-item { position: absolute; display: flex; align-items: center; justify-content: center; border: 3px solid var(--stroke); z-index: 10; touch-action: none; }
         .m-billet { width: 90px; height: 45px; border-radius: 8px; }
         .m-piece { border-radius: 50%; color: var(--stroke); width: 50px; height: 50px; }
-
-        /* Couleurs monnaie */
-        .c-100 { background: var(--m-100); } .c-50 { background: var(--m-50); } 
-        .c-20 { background: var(--m-20); } .c-10 { background: var(--m-10); } 
-        .c-5 { background: var(--m-5); } .c-gold { background: var(--m-gold); }
-        .c-silver { background: #ecf0f1; border-color: #7f8c8d; } 
-        .c-2e-ring { background: #ecf0f1; border: 4px solid #f1c40f !important; }
+        .c-100 { background: var(--m-100); } .c-50 { background: var(--m-50); } .c-20 { background: var(--m-20); } 
+        .c-10 { background: var(--m-10); } .c-5 { background: var(--m-5); } .c-gold { background: var(--m-gold); }
+        .c-silver { background: #ecf0f1; border-color: #7f8c8d; } .c-2e-ring { background: #ecf0f1; border: 4px solid #f1c40f !important; }
         .c-bronze { background: var(--m-bronze); color: white; }
-
-        @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
         .shake { animation: shake 0.4s ease; }
-        .pop { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-
-        #overlay { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
-            display: flex; flex-direction: column; justify-content: center; 
-            align-items: center; z-index: 1000; visibility: hidden; opacity: 0;
-            transition: opacity 0.4s;
-        }
+        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; visibility: hidden; opacity: 0; transition: opacity 0.4s; }
         #overlay.show { visibility: visible; opacity: 1; }
     </style>
 </head>
 <body>
+
+<button onclick="init()" style="position: absolute; top: 10px; right: 10px; z-index: 100; background: rgba(255,255,255,0.3); border: none; border-radius: 50%; width: 45px; height: 45px; color: white; font-size: 1.5rem !important; display: flex; align-items: center; justify-content: center;">🔄</button>
 
 <div id="game-container">
     <div id="top-info">
@@ -137,9 +77,9 @@
         <div id="drawer">
             <div class="drawer-row" id="row-b"></div>
             <div class="drawer-row" id="row-p"></div>
-            <div style="display: flex; gap: 10px;">
-                <button class="num-btn btn-clear" style="flex: 1; margin-top:5px" onclick="clearPlateau()">EFFACER</button>
-                <button class="num-btn btn-check" style="flex: 2; margin-top:5px" onclick="checkFinal()">TERMINER</button>
+            <div style="display: flex; gap: 10px; margin-top:5px">
+                <button class="num-btn btn-clear" style="flex: 1;" onclick="clearPlateau()">EFFACER</button>
+                <button class="num-btn btn-check" style="flex: 2;" onclick="checkFinal()">TERMINER</button>
             </div>
         </div>
     </div>
@@ -147,7 +87,7 @@
 
 <div id="overlay">
     <h1 style="color:white; margin-bottom:20px">BRAVO ! 🌟</h1>
-    <button class="num-btn" style="padding: 15px 40px; background:#2ecc71; color:white" onclick="init()">CONTINUER</button>
+    <button class="num-btn" style="padding: 15px 40px; background:#2ecc71; color:white" onclick="init()">JEU SUIVANT</button>
 </div>
 
 <script>
@@ -185,7 +125,7 @@
 
     function spawn(m) {
         const d = document.createElement('div');
-        d.className = `money-item ${m.t} ${m.c} pop`; d.innerText = m.n; 
+        d.className = `money-item ${m.t} ${m.c}`; d.innerText = m.n; 
         d.style.left = (Math.random() * 50 + 10) + "%"; d.style.top = (Math.random() * 30 + 20) + "%";
         
         const handleStart = (e) => {
@@ -193,7 +133,6 @@
             const touch = e.touches ? e.touches[0] : e;
             let sx = touch.clientX - d.getBoundingClientRect().left;
             let sy = touch.clientY - d.getBoundingClientRect().top;
-            
             const handleMove = (ev) => {
                 const t = ev.touches ? ev.touches[0] : ev;
                 let x = t.clientX - rect.left - sx;
@@ -202,25 +141,24 @@
                 y = Math.max(35, Math.min(y, rect.height - d.offsetHeight));
                 d.style.left = x + 'px'; d.style.top = y + 'px';
             };
-            const handleEnd = () => {
-                document.removeEventListener('mousemove', handleMove);
-                document.removeEventListener('touchmove', handleMove);
-            };
+            const handleEnd = () => { document.removeEventListener('mousemove', handleMove); document.removeEventListener('touchmove', handleMove); };
             document.addEventListener('mousemove', handleMove);
             document.addEventListener('touchmove', handleMove, {passive: false});
             document.addEventListener('mouseup', handleEnd, {once: true});
             document.addEventListener('touchend', handleEnd, {once: true});
         };
-        d.addEventListener('mousedown', handleStart);
-        d.addEventListener('touchstart', handleStart, {passive: false});
+        d.addEventListener('mousedown', handleStart); d.addEventListener('touchstart', handleStart, {passive: false});
         document.getElementById('money-layer').appendChild(d);
     }
 
     function press(v) { if(v === 'C') game.input = ""; else if(game.input.length < 6) game.input += v; update(); }
+    
     function update() { 
         document.getElementById('val-ticket').innerText = (game.ticket/100).toFixed(2); 
         document.getElementById('val-recu').innerText = (parseInt(game.input||0)/100).toFixed(2); 
-        document.getElementById('val-rendre').innerText = (game.step >= 4) ? ((game.received-game.ticket)/100).toFixed(2) : "0.00";
+        // Affiche ce qui RESTE à rendre quand on est à l'étape du rendu
+        let aRendre = (game.received - game.ticket);
+        document.getElementById('val-rendre').innerText = (game.step >= 4) ? ((aRendre - game.userRendu)/100).toFixed(2) : "0.00";
     }
 
     function check() {
@@ -248,8 +186,14 @@
         setTimeout(() => { p.classList.remove('shake'); p.style.backgroundColor = 'var(--plateau)'; }, 500); 
     }
 
-    function clearPlateau() { document.getElementById('money-layer').innerHTML = ""; game.userRendu = 0; }
-    function addRendu(m) { game.userRendu += m.v; spawn(m); }
+    function clearPlateau() { 
+        document.getElementById('money-layer').innerHTML = ""; 
+        game.userRendu = 0; 
+        update(); 
+    }
+    
+    function addRendu(m) { game.userRendu += m.v; spawn(m); update(); }
+    
     buildDrawer(); init();
 </script>
 </body>
