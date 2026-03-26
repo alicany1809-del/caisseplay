@@ -1,11 +1,15 @@
+
+  
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>Caisse Mobile - Fullscreen</title>
+    
+    <title>Caisse Mobile</title>
     <style>
         :root {
             --bg-app: #3498db; --sidebar: #2c3e50; --card: #34495e; --plateau: #f8f9fa;
@@ -14,38 +18,23 @@
             --m-bronze: #d35400; --stroke: #1a252f;
         }
 
-        * { font-size: 1.2rem !important; font-weight: 800; box-sizing: border-box; touch-action: pan-y; }
+        * { font-size: 1.2rem !important; font-weight: 800; box-sizing: border-box; touch-action: manipulation; }
 
-        html, body { 
-            background: var(--bg-app);
-            margin: 0;
-            padding: 0;
-            /* Le secret : une hauteur légèrement supérieure à 100% pour autoriser le scroll qui cache l'URL */
-            min-height: 105vh; 
-        }
+        /* Modifié pour permettre le scroll qui cache la barre d'URL */
+        html, body { min-height: 105vh; background: var(--bg-app); margin: 0; }
 
         body { 
             font-family: 'Segoe UI', sans-serif; 
-            display: flex; 
-            flex-direction: column; 
-            user-select: none; 
-            color: white;
-            padding: 10px;
+            padding: calc(15px + env(safe-area-inset-top)) 10px 10px 10px; 
+            display: flex; flex-direction: column; user-select: none; color: white; 
         }
 
-        /* Conteneur principal calé sur la taille réelle de l'écran */
-        #game-container { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            height: 92vh; 
-            width: 100%;
-        }
-
+        #game-container { display: flex; flex-direction: column; gap: 10px; height: 95vh; }
         #top-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 
         .info-card { 
             background: #ffffff; padding: 5px; border-radius: 12px; text-align: center; 
+            transition: all 0.3s ease;
         }
         .info-card label { display: block; color: #7f8c8d; font-size: 0.7rem !important; }
         .info-card span { display: block; color: #2c3e50; font-size: 1.3rem !important; }
@@ -53,34 +42,56 @@
         #plateau-zone { 
             flex-grow: 1; background: var(--plateau); border-radius: 15px; 
             position: relative; overflow: hidden; border: 3px solid #bdc3c7;
+            transition: border-color 0.3s;
         }
+
+        /* --- TES ANIMATIONS D'ORIGINE --- */
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .shake { animation: shake 0.4s ease-in-out; }
+        .pop { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
         #header-step { background: white; padding: 8px; text-align: center; color: var(--sidebar); font-size: 1rem !important; border-bottom: 2px solid #eee; }
 
-        #numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        #numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; animation: slideUp 0.5s ease; }
 
         .num-btn, .money-btn { 
-            padding: 15px 0; border: none; border-radius: 8px; background: white; 
+            padding: 12px 0; border: none; border-radius: 8px; background: white; 
             color: var(--sidebar); cursor: pointer; box-shadow: 0 4px 0 #bdc3c7; 
-            text-align: center;
+            position: relative; top: 0; text-align: center; transition: transform 0.1s;
         }
         .num-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #bdc3c7; }
 
         .btn-check { background: #2ecc71; color: white; box-shadow: 0 4px 0 #27ae60; }
         .btn-clear { background: #e74c3c; color: white; box-shadow: 0 4px 0 #c0392b; }
-        .money-btn { border: 2px solid var(--stroke); color: white; box-shadow: 0 3px 0 var(--stroke); flex: 1; font-size: 1rem !important; }
+        .money-btn { border: 2px solid var(--stroke); color: white; box-shadow: 0 3px 0 var(--stroke); flex: 1; }
 
-        #drawer { display: none; padding: 5px 0; }
+        #drawer { display: none; padding: 5px 0; animation: slideUp 0.5s ease; }
         .drawer-row { display: flex; gap: 5px; margin-bottom: 5px; }
 
         .money-item { 
-            position: absolute; display: flex; align-items: center; justify-content: center; 
-            border: 3px solid var(--stroke); z-index: 10; touch-action: none;
+            position: absolute; cursor: grab; display: flex; 
+            align-items: center; justify-content: center; 
+            border: 3px solid var(--stroke); z-index: 10;
+            touch-action: none;
         }
-        .m-billet { width: 90px; height: 45px; border-radius: 6px; }
-        .m-piece { border-radius: 50%; width: 50px; height: 50px; }
+        .m-billet { width: 100px; height: 50px; border-radius: 8px; }
+        .m-piece { border-radius: 50%; color: var(--stroke); width: 55px; height: 55px; }
 
-        /* Couleurs */
+        /* Couleurs monnaie */
         .c-100 { background: var(--m-100); } .c-50 { background: var(--m-50); } 
         .c-20 { background: var(--m-20); } .c-10 { background: var(--m-10); } 
         .c-5 { background: var(--m-5); } .c-gold { background: var(--m-gold); }
@@ -95,18 +106,15 @@
             transition: opacity 0.4s;
         }
         #overlay.show { visibility: visible; opacity: 1; }
-
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
-        .shake { animation: shake 0.3s ease-in-out; }
     </style>
 </head>
 <body>
 
 <div id="game-container">
     <div id="top-info">
-        <div class="info-card"><label>TICKET</label><span id="val-ticket">0.00</span></div>
-        <div class="info-card"><label>REÇU</label><span id="val-recu">0.00</span></div>
-        <div class="info-card"><label>RENDU</label><span id="val-rendre">0.00</span></div>
+        <div class="info-card" id="card-payer"><label>A PAYER</label><span id="val-ticket">0.00</span></div>
+        <div class="info-card" id="card-recu"><label>REÇU</label><span id="val-recu">0.00</span></div>
+        <div class="info-card" id="card-rendre"><label>A RENDRE</label><span id="val-rendre">0.00</span></div>
     </div>
 
     <div id="plateau-zone">
@@ -134,32 +142,31 @@
             <div class="drawer-row" id="row-b"></div>
             <div class="drawer-row" id="row-p"></div>
             <div style="display: flex; gap: 10px;">
-                <button class="num-btn btn-clear" style="flex: 1;" onclick="clearPlateau()">EFFACER</button>
-                <button class="num-btn btn-check" style="flex: 2;" onclick="checkFinal()">TERMINER</button>
+                <button class="num-btn btn-clear" style="flex: 1; margin-top:10px" onclick="clearPlateau()">EFFACER</button>
+                <button class="num-btn btn-check" style="flex: 2; margin-top:10px" onclick="checkFinal()">TERMINER</button>
             </div>
         </div>
     </div>
 </div>
 
 <div id="overlay">
-    <h1 style="font-size: 2.5rem !important;">BRAVO ! 🌟</h1>
-    <button class="num-btn" style="padding: 15px 40px; background:#2ecc71; color:white;" onclick="init()">CONTINUER</button>
+    <h1 style="font-size: 3rem !important; margin-bottom: 20px;">BRAVO ! 🌟</h1>
+    <button class="num-btn" style="padding: 20px 50px; background:#2ecc71; color:white; font-size: 1.5rem !important;" onclick="init()">JEU SUIVANT</button>
 </div>
 
 <script>
-    // --- LOGIQUE PLEIN ÉCRAN AUTOMATIQUE ---
-    // Cache la barre d'adresse au premier clic/touche
-    document.addEventListener('touchstart', function() {
-        window.scrollTo(0, 1);
-        const de = document.documentElement;
+    // --- SCRIPT PLEIN ECRAN AUTO ---
+    window.onload = function() { setTimeout(() => window.scrollTo(0, 1), 100); };
+    document.addEventListener('touchstart', () => {
+        let de = document.documentElement;
         if(de.requestFullscreen) de.requestFullscreen();
         else if(de.webkitRequestFullscreen) de.webkitRequestFullscreen();
     }, { once: true });
 
     const MONNAIE = [
-        {v:10000, n:'100', c:'c-100', t:'m-billet'}, {v:5000, n:'50', c:'c-50', t:'m-billet'},
-        {v:2000, n:'20', c:'c-20', t:'m-billet'}, {v:1000, n:'10', c:'c-10', t:'m-billet'},
-        {v:500, n:'5', c:'c-5', t:'m-billet'}, {v:200, n:'2€', c:'c-2e-ring', t:'m-piece'},
+        {v:10000, n:'100€', c:'c-100', t:'m-billet'}, {v:5000, n:'50€', c:'c-50', t:'m-billet'},
+        {v:2000, n:'20€', c:'c-20', t:'m-billet'}, {v:1000, n:'10€', c:'c-10', t:'m-billet'},
+        {v:500, n:'5€', c:'c-5', t:'m-billet'}, {v:200, n:'2€', c:'c-2e-ring', t:'m-piece'},
         {v:100, n:'1€', c:'c-silver', t:'m-piece'}, {v:50, n:'50c', c:'c-gold', t:'m-piece'},
         {v:20, n:'20c', c:'c-gold', t:'m-piece'}, {v:10, n:'10c', c:'c-gold', t:'m-piece'},
         {v:5, n:'5c', c:'c-bronze', t:'m-piece'}, {v:2, n:'2c', c:'c-bronze', t:'m-piece'},
@@ -168,58 +175,81 @@
     let game = { step: 1, ticket: 0, received: 0, input: "", userRendu: 0 };
 
     function buildDrawer() {
-        document.getElementById('row-b').innerHTML = ""; document.getElementById('row-p').innerHTML = "";
+        document.getElementById('row-b').innerHTML = "";
+        document.getElementById('row-p').innerHTML = "";
         MONNAIE.forEach(m => {
             const btn = document.createElement('button');
-            btn.className = `money-btn ${m.c}`; btn.innerText = m.n;
-            btn.onclick = () => { if(game.step === 4) { game.userRendu += m.v; spawn(m); update(); } };
+            btn.className = `money-btn ${m.c.split(' ')[0]}`;
+            btn.innerText = m.n;
+            btn.onclick = () => { if(game.step === 4) addRendu(m); };
             document.getElementById(m.t === 'm-billet' ? 'row-b' : 'row-p').appendChild(btn);
         });
     }
 
     function init() {
-        game = { step: 2, ticket: Math.floor(Math.random() * 3000) + 500, received: 0, input: "", userRendu: 0 };
+        game = { step: 2, ticket: Math.floor(Math.random() * 4000) + 200, received: 0, input: "", userRendu: 0 };
         document.getElementById('money-layer').innerHTML = "";
         document.getElementById('overlay').classList.remove('show');
         document.getElementById('numpad').style.display = "grid";
         document.getElementById('drawer').style.display = "none";
         document.getElementById('header-step').innerText = "Combien a-t-on reçu ?";
-        
-        let target = game.ticket + (Math.floor(Math.random() * 2000));
-        let s = 0; while(s < target) { let m = MONNAIE[Math.floor(Math.random() * 5) + 3]; s += m.v; spawn(m); }
+        let s = 0; while(s < game.ticket) { let m = MONNAIE[Math.floor(Math.random() * 5) + 3]; s += m.v; spawn(m, false); }
         game.received = s; update();
     }
 
-    function spawn(m) {
+    function clearPlateau() {
+        document.getElementById('money-layer').innerHTML = "";
+        game.userRendu = 0;
+        update();
+    }
+
+    function spawn(m, isUser) {
         const d = document.createElement('div');
-        d.className = `money-item ${m.t} ${m.c}`; d.innerText = m.n; 
-        d.style.left = (Math.random() * 60 + 5) + "%"; d.style.top = (Math.random() * 50 + 20) + "%";
-        
-        d.ontouchstart = (e) => {
-            let touch = e.touches[0];
-            let shiftX = touch.clientX - d.getBoundingClientRect().left;
-            let shiftY = touch.clientY - d.getBoundingClientRect().top;
-            d.style.zIndex = 1000;
-            
-            d.ontouchmove = (ev) => {
-                let t = ev.touches[0];
-                let rect = document.getElementById('plateau-zone').getBoundingClientRect();
-                let x = t.clientX - rect.left - shiftX;
-                let y = t.clientY - rect.top - shiftY;
+        d.className = `money-item ${m.t} ${m.c} pop`;
+        d.innerText = m.n; 
+        d.style.left = (Math.random() * 50 + 10) + "%";
+        d.style.top = (Math.random() * 30 + 20) + "%";
+
+        const handleStart = (e) => {
+            const rect = document.getElementById('plateau-zone').getBoundingClientRect();
+            const touch = e.type.includes('touch') ? e.touches[0] : e;
+            let sx = touch.clientX - d.getBoundingClientRect().left;
+            let sy = touch.clientY - d.getBoundingClientRect().top;
+            d.style.zIndex = 100;
+
+            const handleMove = (ev) => {
+                const t = ev.type.includes('touch') ? ev.touches[0] : ev;
+                let x = t.clientX - rect.left - sx;
+                let y = t.clientY - rect.top - sy;
                 x = Math.max(0, Math.min(x, rect.width - d.offsetWidth));
                 y = Math.max(40, Math.min(y, rect.height - d.offsetHeight));
-                d.style.left = x + 'px'; d.style.top = y + 'px';
+                d.style.left = x + 'px';
+                d.style.top = y + 'px';
             };
-            d.ontouchend = () => { d.ontouchmove = null; d.style.zIndex = 10; };
+
+            const handleEnd = () => {
+                d.style.zIndex = 10;
+                document.removeEventListener('mousemove', handleMove);
+                document.removeEventListener('touchmove', handleMove);
+            };
+
+            document.addEventListener('mousemove', handleMove);
+            document.addEventListener('touchmove', handleMove, {passive: false});
+            document.addEventListener('mouseup', handleEnd, {once: true});
+            document.addEventListener('touchend', handleEnd, {once: true});
         };
+
+        d.addEventListener('mousedown', handleStart);
+        d.addEventListener('touchstart', handleStart, {passive: false});
         document.getElementById('money-layer').appendChild(d);
     }
 
-    function press(v) { if(v==='C') game.input = ""; else if(game.input.length < 6) game.input += v; update(); }
+    function press(v) { if(v === 'C') game.input = ""; else if(game.input.length < 6) game.input += v; update(); }
+    
     function update() { 
         document.getElementById('val-ticket').innerText = (game.ticket/100).toFixed(2); 
         document.getElementById('val-recu').innerText = (parseInt(game.input||0)/100).toFixed(2); 
-        document.getElementById('val-rendre').innerText = (game.step >= 4) ? (game.userRendu/100).toFixed(2) : "0.00";
+        document.getElementById('val-rendre').innerText = (game.step >= 4) ? ((game.received-game.ticket)/100).toFixed(2) : "0.00";
     }
 
     function check() {
@@ -229,26 +259,43 @@
             document.getElementById('money-layer').innerHTML = "";
             document.getElementById('numpad').style.display = "none";
             document.getElementById('drawer').style.display = "block";
-        } else feedback(false);
+            update();
+            a();
+        } else { errorEffect(); }
     }
 
     function checkFinal() { 
-        if(game.userRendu === (game.received - game.ticket)) {
+        if(Math.round(game.userRendu) === (game.received - game.ticket)) {
             document.getElementById('overlay').classList.add('show');
-        } else feedback(false);
+            a();
+        } else { errorEffect(); } 
     }
 
-    function clearPlateau() { document.getElementById('money-layer').innerHTML = ""; game.userRendu = 0; update(); }
-
-    function feedback(win) {
-        const p = document.getElementById('plateau-zone');
+    function errorEffect() { 
+        const p = document.getElementById('plateau-zone'); 
         p.classList.add('shake');
-        p.style.backgroundColor = win ? '#2ecc71' : '#e74c3c';
-        setTimeout(() => { p.classList.remove('shake'); p.style.backgroundColor = 'var(--plateau)'; }, 400);
+        p.style.borderColor = '#e74c3c'; 
+        p.style.backgroundColor = '#e74c3c'; 
+        setTimeout(() => {
+            p.style.backgroundColor = '#f8f9fa'; 
+            p.classList.remove('shake');
+            p.style.borderColor='#bdc3c7';
+        }, 600); 
+    }
+    function a() { 
+        const p = document.getElementById('plateau-zone'); 
+        p.classList.add('shake');
+        p.style.borderColor = '#2ecc71'; 
+        p.style.backgroundColor = '#2ecc71'; 
+        setTimeout(() => {
+            p.style.backgroundColor = '#f8f9fa'; 
+            p.classList.remove('shake');
+            p.style.borderColor='#bdc3c7';
+        }, 600); 
     }
 
+    function addRendu(m) { game.userRendu += m.v; spawn(m, true); }
     buildDrawer(); init();
 </script>
 </body>
-  </html>
-  
+</html>
