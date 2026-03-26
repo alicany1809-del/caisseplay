@@ -26,11 +26,12 @@
         .info-card label { display: block; color: #7f8c8d; font-size: 0.6rem !important; text-transform: uppercase; }
         .info-card span { display: block; color: #2c3e50; font-size: 1.1rem !important; }
 
-        /* Style du bouton actualiser identique aux autres */
+        /* MODIFICATION : Taille égale aux num-btn */
         .btn-reset { 
-            background: var(--btn-reset); color: white; border: none; border-radius: 12px;
-            width: 55px; box-shadow: 0 4px 0 #8e44ad; cursor: pointer;
+            background: var(--btn-reset); color: white; border: none; border-radius: 8px;
+            width: 55px; padding: 12px 0; box-shadow: 0 4px 0 #8e44ad; cursor: pointer;
             display: flex; align-items: center; justify-content: center; font-size: 1.5rem !important;
+            position: relative;
         }
         .btn-reset:active { transform: translateY(2px); box-shadow: 0 2px 0 #8e44ad; }
 
@@ -179,7 +180,6 @@
         document.getElementById('val-ticket').innerText = (game.ticket/100).toFixed(2); 
         document.getElementById('val-recu').innerText = (parseInt(game.input||0)/100).toFixed(2); 
         
-        // CORRECTION : A RENDRE affiche maintenant la cible fixe à atteindre
         let cibleARendre = (game.received - game.ticket);
         document.getElementById('val-rendre').innerText = (game.step >= 4) ? (cibleARendre/100).toFixed(2) : "0.00";
     }
