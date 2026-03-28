@@ -136,14 +136,23 @@
     }
 
     function init() {
-        game = { step: 2, ticket: Math.floor(Math.random() * 4000) + 200, received: 0, input: "", userRendu: 0 };
+        // Prix aléatoire entre 2€ et 100€
+        game = { step: 2, ticket: Math.floor(Math.random() * 9800) + 200, received: 0, input: "", userRendu: 0 };
         document.getElementById('money-layer').innerHTML = "";
         document.getElementById('overlay').classList.remove('show');
         document.getElementById('numpad').style.display = "grid";
         document.getElementById('drawer').style.display = "none";
         document.getElementById('header-step').innerText = "Combien a-t-on reçu ?";
-        let s = 0; while(s < game.ticket) { let m = MONNAIE[Math.floor(Math.random() * 5) + 3]; s += m.v; spawn(m); }
-        game.received = s; update();
+
+        // Le client donne un mélange de billets et pièces (toute la gamme MONNAIE)
+        let s = 0;
+        while(s < game.ticket) {
+            let m = MONNAIE[Math.floor(Math.random() * MONNAIE.length)];
+            s += m.v;
+            spawn(m);
+        }
+        game.received = s; 
+        update();
     }
 
     function spawn(m) {
@@ -180,6 +189,7 @@
         document.getElementById('val-ticket').innerText = (game.ticket/100).toFixed(2); 
         document.getElementById('val-recu').innerText = (parseInt(game.input||0)/100).toFixed(2); 
         
+        // A RENDRE reste fixe une fois l'étape 4 atteinte
         let cibleARendre = (game.received - game.ticket);
         document.getElementById('val-rendre').innerText = (game.step >= 4) ? (cibleARendre/100).toFixed(2) : "0.00";
     }
