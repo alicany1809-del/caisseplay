@@ -123,8 +123,7 @@
     }
 
     function init() {
-        // Prix entre 5€ et 80€
-        game = { step: 2, ticket: Math.floor(Math.random() * 7500) + 500, received: 0, input: "", userRendu: 0 };
+        game = { step: 2, ticket: Math.floor(Math.random() * 8500) + 500, received: 0, input: "", userRendu: 0 };
         document.getElementById('money-layer').innerHTML = "";
         document.getElementById('overlay').classList.remove('show');
         document.getElementById('numpad').style.display = "grid";
@@ -132,23 +131,33 @@
         document.getElementById('header-step').innerText = "Combien a-t-on reçu ?";
 
         let s = 0;
-        // On force entre 4 et 8 objets pour que ce soit visuel et complexe
-        const nbObjets = Math.floor(Math.random() * 5) + 4; 
-        
-        for(let i = 0; i < nbObjets; i++) {
-            // On choisit des pièces et billets variés
-            let m = MONNAIE[Math.floor(Math.random() * (MONNAIE.length - 2)) + 2]; 
+        let objetsDonnes = [];
+
+        // Étape 1 : Le client donne de quoi couvrir la majorité du prix avec des billets/pièces logiques
+        while (s < game.ticket - 500) { // On s'arrête 5€ avant pour forcer des petites pièces
+            let m = MONNAIE.filter(x => x.v <= (game.ticket - s + 2000))[Math.floor(Math.random() * 3)]; 
+            if(!m) m = MONNAIE[4];
             s += m.v;
-            spawn(m);
+            objetsDonnes.push(m);
         }
 
-        // Si par hasard le total est inférieur au ticket, on ajoute un gros billet
-        if (s < game.ticket) {
-            let grosBillet = MONNAIE.find(m => m.v >= (game.ticket - s)) || MONNAIE[3];
-            s += grosBillet.v;
-            spawn(grosBillet);
+        // Étape 2 : On complète pour dépasser le prix avec beaucoup de petits objets (4 à 8 au total)
+        while (objetsDonnes.length < 6 || s < game.ticket) {
+            let reste = game.ticket - s;
+            let m;
+            if (reste > 0) {
+                // Doit donner plus pour payer
+                m = MONNAIE[Math.floor(Math.random() * 5) + 6]; // Pièces de 2€ à 10c
+            } else {
+                // A déjà assez payé mais donne quand même des petites pièces (le client vide son porte-monnaie)
+                m = MONNAIE[Math.floor(Math.random() * 4) + 9]; // Pièces de 10c à 1c
+            }
+            s += m.v;
+            objetsDonnes.push(m);
+            if(objetsDonnes.length >= 8) break; 
         }
 
+        objetsDonnes.forEach(m => spawn(m));
         game.received = s; 
         update();
     }
