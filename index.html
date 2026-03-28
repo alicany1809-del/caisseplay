@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Caisse Hyper-Réaliste 0.50-350€</title>
+    <title>Caisse Réaliste</title>
     <style>
         :root {
             --bg-app: #3498db; --sidebar: #2c3e50; --plateau: #f8f9fa;
-            --m-200: #f1c40f; --m-100: #2ecc71; --m-50: #e67e22; --m-20: #3498db;
+            --m-100: #2ecc71; --m-50: #e67e22; --m-20: #3498db;
             --m-10: #e74c3c; --m-5: #95a5a6; --m-gold: #f1c40f;
             --m-bronze: #d35400; --stroke: #1a252f;
         }
@@ -31,13 +31,12 @@
         
         #drawer { display: none; }
         .drawer-row { display: flex; gap: 4px; margin-bottom: 4px; }
-        .money-btn { flex: 1; border: 2px solid var(--stroke); color: white; font-size: 0.7rem !important; padding: 10px 0; }
+        .money-btn { flex: 1; border: 2px solid var(--stroke); color: white; font-size: 0.8rem !important; padding: 10px 0; }
         
-        .money-item { position: absolute; display: flex; align-items: center; justify-content: center; border: 3px solid var(--stroke); z-index: 10; transition: transform 0.1s; }
+        .money-item { position: absolute; display: flex; align-items: center; justify-content: center; border: 3px solid var(--stroke); z-index: 10; }
         .m-billet { width: 90px; height: 45px; border-radius: 6px; }
         .m-piece { width: 50px; height: 50px; border-radius: 50%; color: var(--stroke); }
         
-        .c-200 { background: #fef5d4; border-color: #f1c40f !important; color: #b8860b; }
         .c-100 { background: var(--m-100); } .c-50 { background: var(--m-50); } .c-20 { background: var(--m-20); } 
         .c-10 { background: var(--m-10); } .c-5 { background: var(--m-5); } .c-gold { background: var(--m-gold); }
         .c-silver { background: #ecf0f1; } .c-2e-ring { background: #ecf0f1; border: 4px solid #f1c40f !important; }
@@ -80,8 +79,7 @@
         </div>
 
         <div id="drawer">
-            <div class="drawer-row" id="row-b1"></div>
-            <div class="drawer-row" id="row-b2"></div>
+            <div class="drawer-row" id="row-b"></div>
             <div class="drawer-row" id="row-p"></div>
             <div style="display:flex; gap:8px">
                 <button class="num-btn btn-clear" style="flex:1" onclick="clearPlateau()">EFFACER</button>
@@ -92,136 +90,151 @@
 </div>
 
 <div id="overlay">
-    <h1 style="color:white">BIEN JOUÉ ! ✅</h1>
-    <button class="num-btn" style="padding:15px 50px" onclick="init()">CLIENT SUIVANT</button>
+    <h1 style="color:white">PARFAIT ! 💰</h1>
+    <button class="num-btn" style="padding:15px 50px" onclick="init()">SUIVANT</button>
 </div>
 
 <script>
     const MONNAIE = [
-        {v:20000, n:'200€', c:'c-200', t:'m-billet'}, {v:10000, n:'100€', c:'c-100', t:'m-billet'}, 
-        {v:5000, n:'50€', c:'c-50', t:'m-billet'}, {v:2000, n:'20€', c:'c-20', t:'m-billet'}, 
-        {v:1000, n:'10€', c:'c-10', t:'m-billet'}, {v:500, n:'5€', c:'c-5', t:'m-billet'}, 
-        {v:200, n:'2€', c:'c-2e-ring', t:'m-piece'}, {v:100, n:'1€', c:'c-silver', t:'m-piece'}, 
-        {v:50, n:'50c', c:'c-gold', t:'m-piece'}, {v:20, n:'20c', c:'c-gold', t:'m-piece'}, 
-        {v:10, n:'10c', c:'c-gold', t:'m-piece'}, {v:5, n:'5c', c:'c-bronze', t:'m-piece'}, 
-        {v:2, n:'2c', c:'c-bronze', t:'m-piece'}, {v:1, n:'1c', c:'c-bronze', t:'m-piece'}
+        {v:10000, n:'100€', c:'c-100', t:'m-billet'}, {v:5000, n:'50€', c:'c-50', t:'m-billet'},
+        {v:2000, n:'20€', c:'c-20', t:'m-billet'}, {v:1000, n:'10€', c:'c-10', t:'m-billet'},
+        {v:500, n:'5€', c:'c-5', t:'m-billet'}, {v:200, n:'2€', c:'c-2e-ring', t:'m-piece'},
+        {v:100, n:'1€', c:'c-silver', t:'m-piece'}, {v:50, n:'50c', c:'c-gold', t:'m-piece'},
+        {v:20, n:'20c', c:'c-gold', t:'m-piece'}, {v:10, n:'10c', c:'c-gold', t:'m-piece'},
+        {v:5, n:'5c', c:'c-bronze', t:'m-piece'}, {v:2, n:'2c', c:'c-bronze', t:'m-piece'},
+        {v:1, n:'1c', c:'c-bronze', t:'m-piece'}
     ];
 
     let game = { ticket: 0, received: 0, input: "", userRendu: 0, step: 1 };
 
     function init() {
-        // PRIX ENTRE 0.50€ et 350.00€
-        game = { step: 1, ticket: Math.floor(Math.random() * 34951) + 50, received: 0, input: "", userRendu: 0 };
+        // NOUVELLE PLAGE DE PRIX : 0.20€ à 400.00€
+        game = { step: 1, ticket: Math.floor(Math.random() * 39981) + 20, received: 0, input: "", userRendu: 0 };
         document.getElementById('money-layer').innerHTML = "";
         document.getElementById('overlay').style.display = "none";
         document.getElementById('numpad').style.display = "grid";
         document.getElementById('drawer').style.display = "none";
-        document.getElementById('header-step').innerText = "Comptez l'argent du client...";
+        document.getElementById('header-step').innerText = "Combien le client donne-t-il ?";
         
-        genererPaiementClient();
+        genererPaiementRealiste();
         updateUI();
     }
 
-    function genererPaiementClient() {
-        let s = 0; let objets = [];
+    function genererPaiementRealiste() {
+        let s = 0;
+        let objets = [];
         const centimes = game.ticket % 100;
-        const rand = Math.random();
+        const choix = Math.random();
 
-        // 1. Paiement par billets (Le client donne ce qu'il faut)
-        if (rand < 0.6) {
+        if (choix < 0.50) { 
+            // 1. PAIEMENT LOGIQUE (Billets suffisant pour couvrir le prix)
             while (s < game.ticket) {
-                let billet = MONNAIE.filter(m => m.t === 'm-billet').find(m => m.v >= (game.ticket - s));
-                if(!billet) billet = MONNAIE[0];
-                objets.push(billet); s += billet.v;
-                if(s >= game.ticket) break;
+                let billet = MONNAIE.find(m => m.v >= (game.ticket - s) && m.t === 'm-billet') || MONNAIE[0];
+                objets.push(billet);
+                s += billet.v;
+                if (choix < 0.25) break; // Un seul gros billet si possible, sinon plusieurs
             }
         } 
-        // 2. L'appoint (Plusieurs billets + centimes pile)
-        else {
-            let cibleBillet = game.ticket - centimes;
-            let currentS = 0;
-            while(currentS < cibleBillet) {
-                let b = MONNAIE.filter(m => m.t === 'm-billet' && m.v <= 10000)[Math.floor(Math.random()*4)+1];
-                objets.push(b); currentS += b.v;
+        else if (choix < 0.80) {
+            // 2. L'APPOINT (Billet + centimes pile pour éviter la petite monnaie)
+            let tempS = 0;
+            while (tempS < game.ticket) {
+                let billet = MONNAIE.find(m => m.v >= (game.ticket - tempS) && m.t === 'm-billet') || MONNAIE[0];
+                objets.push(billet);
+                tempS += billet.v;
+                break; 
             }
-            s = currentS;
+            s = tempS + centimes;
             let reste = centimes;
             while(reste > 0) {
                 let p = MONNAIE.find(m => m.v <= reste && m.t === 'm-piece');
-                objets.push(p); s += p.v; reste -= p.v;
+                objets.push(p); reste -= p.v;
+            }
+        } 
+        else {
+            // 3. PETITS BILLETS + PIÈCES
+            let cible = game.ticket;
+            while (s < cible) {
+                let m = MONNAIE[Math.floor(Math.random() * 6) + 2]; // 20€ à 1€
+                s += m.v; objets.push(m);
             }
         }
 
-        // Toujours ajouter 1-3 pièces de "fond de poche" pour le réalisme
-        for(let i=0; i < Math.floor(Math.random()*3)+1; i++) {
-            let p = MONNAIE[Math.floor(Math.random()*4)+10];
-            s += p.v; objets.push(p);
+        // Ajout aléatoire d'une petite pièce de fond de poche (1c, 2c, 5c)
+        if(Math.random() > 0.6) {
+            let petite = MONNAIE[Math.floor(Math.random() * 3) + 10];
+            s += petite.v; objets.push(petite);
         }
 
         game.received = s;
-        objets.forEach(m => spawn(m));
+        objets.forEach(m => spawn(m, true));
     }
 
-    function spawn(m) {
+    function spawn(m, auto) {
         const d = document.createElement('div');
         d.className = `money-item ${m.t} ${m.c}`; d.innerText = m.n;
-        d.style.left = (Math.random() * 65 + 5) + "%"; d.style.top = (Math.random() * 55 + 15) + "%";
+        d.style.left = (Math.random() * 60 + 10) + "%";
+        d.style.top = (Math.random() * 50 + 20) + "%";
+        
         d.onmousedown = d.ontouchstart = (e) => {
-            d.style.zIndex = 1000;
             const move = (ev) => {
-                const t = ev.touches ? ev.touches[0] : ev;
-                d.style.left = (t.clientX - 45) + "px"; d.style.top = (t.clientY - 25) + "px";
+                const touch = ev.touches ? ev.touches[0] : ev;
+                d.style.left = (touch.clientX - 40) + "px"; d.style.top = (touch.clientY - 20) + "px";
             };
             document.onmousemove = document.ontouchmove = move;
-            document.onmouseup = document.ontouchend = () => {
-                document.onmousemove = document.ontouchmove = null;
-                d.style.zIndex = 10;
-            }
+            document.onmouseup = document.ontouchend = () => document.onmousemove = document.ontouchmove = null;
         };
         document.getElementById('money-layer').appendChild(d);
     }
 
-    function press(v) { if(v === 'C') game.input = ""; else if(game.input.length < 7) game.input += v; updateUI(); }
+    function press(v) { 
+        if(v === 'C') game.input = ""; 
+        else if(game.input.length < 7) game.input += v; 
+        updateUI(); 
+    }
 
     function updateUI() {
         document.getElementById('val-ticket').innerText = (game.ticket/100).toFixed(2);
         document.getElementById('val-recu').innerText = (parseInt(game.input||0)/100).toFixed(2);
-        document.getElementById('val-rendre').innerText = game.step === 2 ? ((game.received - game.ticket)/100).toFixed(2) : "0.00";
+        let renduCible = (game.received - game.ticket) / 100;
+        document.getElementById('val-rendre').innerText = game.step === 2 ? renduCible.toFixed(2) : "0.00";
     }
 
     function checkRecu() {
         if(parseInt(game.input) === game.received) {
             game.step = 2;
-            document.getElementById('header-step').innerText = "Rendez la monnaie exacte !";
+            document.getElementById('header-step').innerText = "Rendez la monnaie !";
             document.getElementById('money-layer').innerHTML = "";
             document.getElementById('numpad').style.display = "none";
             document.getElementById('drawer').style.display = "block";
             updateUI();
-        } else feedback(false);
+        } else { feedback(false); }
     }
 
     function checkFinal() {
         if(Math.round(game.userRendu) === (game.received - game.ticket)) {
             document.getElementById('overlay').style.display = "flex";
-        } else feedback(false);
+        } else { feedback(false); }
     }
 
     function feedback(win) {
         const p = document.getElementById('plateau-zone');
-        p.classList.add('shake'); p.style.background = win ? '#2ecc71' : '#e74c3c';
+        p.classList.add('shake');
+        p.style.background = win ? '#2ecc71' : '#e74c3c';
         setTimeout(() => { p.classList.remove('shake'); p.style.background = 'var(--plateau)'; }, 500);
     }
 
     function clearPlateau() { document.getElementById('money-layer').innerHTML = ""; game.userRendu = 0; }
-    function addRendu(m) { game.userRendu += m.v; spawn(m); }
+    function addRendu(m) { game.userRendu += m.v; spawn(m, false); }
 
     function buildDrawer() {
-        MONNAIE.forEach((m, i) => {
+        document.getElementById('row-b').innerHTML = "";
+        document.getElementById('row-p').innerHTML = "";
+        MONNAIE.forEach(m => {
             const b = document.createElement('button');
             b.className = `money-btn ${m.c}`; b.innerText = m.n;
             b.onclick = () => addRendu(m);
-            let row = m.t === 'm-billet' ? (i < 3 ? 'row-b1' : 'row-b2') : 'row-p';
-            document.getElementById(row).appendChild(b);
+            document.getElementById(m.t === 'm-billet' ? 'row-b' : 'row-p').appendChild(b);
         });
     }
 
