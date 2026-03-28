@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Caisse Mobile</title>
+    <title>Caisse Mobile Lidl Style</title>
     <style>
         :root {
             --bg-app: #3498db; --sidebar: #2c3e50; --card: #34495e; --plateau: #f8f9fa;
@@ -25,7 +25,6 @@
             background: var(--btn-reset); color: white; border: none; border-radius: 8px;
             width: 55px; padding: 12px 0; box-shadow: 0 4px 0 #8e44ad; cursor: pointer;
             display: flex; align-items: center; justify-content: center; font-size: 1.5rem !important;
-            position: relative;
         }
         .btn-reset:active { transform: translateY(2px); box-shadow: 0 2px 0 #8e44ad; }
         #plateau-zone { flex-grow: 1; background: var(--plateau); border-radius: 15px; position: relative; overflow: hidden; border: 3px solid #bdc3c7; }
@@ -38,9 +37,9 @@
         #drawer { display: none; padding: 5px 0; }
         .drawer-row { display: flex; gap: 5px; margin-bottom: 5px; }
         .money-btn { border: 2px solid var(--stroke); color: white; box-shadow: 0 3px 0 var(--stroke); flex: 1; font-size: 0.9rem !important; }
-        .money-item { position: absolute; display: flex; align-items: center; justify-content: center; border: 3px solid var(--stroke); z-index: 10; touch-action: none; }
-        .m-billet { width: 90px; height: 45px; border-radius: 8px; }
-        .m-piece { border-radius: 50%; color: var(--stroke); width: 50px; height: 50px; }
+        .money-item { position: absolute; display: flex; align-items: center; justify-content: center; border: 3px solid var(--stroke); z-index: 10; touch-action: none; text-align: center; }
+        .m-billet { width: 90px; height: 45px; border-radius: 8px; font-size: 0.8rem !important; }
+        .m-piece { border-radius: 50%; color: var(--stroke); width: 50px; height: 50px; font-size: 0.8rem !important; }
         .c-100 { background: var(--m-100); } .c-50 { background: var(--m-50); } .c-20 { background: var(--m-20); } 
         .c-10 { background: var(--m-10); } .c-5 { background: var(--m-5); } .c-gold { background: var(--m-gold); }
         .c-silver { background: #ecf0f1; border-color: #7f8c8d; } .c-2e-ring { background: #ecf0f1; border: 4px solid #f1c40f !important; }
@@ -123,42 +122,56 @@
     }
 
     function init() {
-        game = { step: 2, ticket: Math.floor(Math.random() * 8500) + 500, received: 0, input: "", userRendu: 0 };
+        let typeAchat = Math.random(); 
+        
+        if (typeAchat < 0.3) {
+            game.ticket = Math.floor(Math.random() * 500) + 90; 
+        } else if (typeAchat < 0.8) {
+            game.ticket = Math.floor(Math.random() * 4500) + 1500; 
+        } else {
+            game.ticket = Math.floor(Math.random() * 25000) + 8000; 
+        }
+
+        if (Math.random() > 0.7) {
+            game.ticket = Math.floor(game.ticket / 100) * 100 + 99;
+        }
+
+        game.step = 2;
+        game.input = "";
+        game.userRendu = 0;
+        
+        let s = 0;
+        let objetsDonnes = [];
+
+        // Le client donne assez d'argent
+        while (s < game.ticket) {
+            let reste = game.ticket - s;
+            let choixPossibles;
+            if(reste > 2000) choixPossibles = MONNAIE.filter(m => m.v >= 1000);
+            else if(reste > 500) choixPossibles = MONNAIE.filter(m => m.v >= 500);
+            else choixPossibles = MONNAIE.filter(m => m.v >= 10);
+            
+            let m = choixPossibles[Math.floor(Math.random() * choixPossibles.length)];
+            s += m.v;
+            objetsDonnes.push(m);
+            if (s >= game.ticket) break;
+        }
+
+        // Appoint (ex: payer 10.02 avec 20€ et 2c)
+        if (Math.random() > 0.6) {
+            let p = MONNAIE[Math.floor(Math.random() * 6) + 7];
+            s += p.v;
+            objetsDonnes.push(p);
+        }
+
+        game.received = s;
         document.getElementById('money-layer').innerHTML = "";
         document.getElementById('overlay').classList.remove('show');
         document.getElementById('numpad').style.display = "grid";
         document.getElementById('drawer').style.display = "none";
         document.getElementById('header-step').innerText = "Combien a-t-on reçu ?";
-
-        let s = 0;
-        let objetsDonnes = [];
-
-        // Étape 1 : Le client donne de quoi couvrir la majorité du prix avec des billets/pièces logiques
-        while (s < game.ticket - 500) { // On s'arrête 5€ avant pour forcer des petites pièces
-            let m = MONNAIE.filter(x => x.v <= (game.ticket - s + 2000))[Math.floor(Math.random() * 3)]; 
-            if(!m) m = MONNAIE[4];
-            s += m.v;
-            objetsDonnes.push(m);
-        }
-
-        // Étape 2 : On complète pour dépasser le prix avec beaucoup de petits objets (4 à 8 au total)
-        while (objetsDonnes.length < 6 || s < game.ticket) {
-            let reste = game.ticket - s;
-            let m;
-            if (reste > 0) {
-                // Doit donner plus pour payer
-                m = MONNAIE[Math.floor(Math.random() * 5) + 6]; // Pièces de 2€ à 10c
-            } else {
-                // A déjà assez payé mais donne quand même des petites pièces (le client vide son porte-monnaie)
-                m = MONNAIE[Math.floor(Math.random() * 4) + 9]; // Pièces de 10c à 1c
-            }
-            s += m.v;
-            objetsDonnes.push(m);
-            if(objetsDonnes.length >= 8) break; 
-        }
-
+        
         objetsDonnes.forEach(m => spawn(m));
-        game.received = s; 
         update();
     }
 
@@ -179,17 +192,26 @@
                 y = Math.max(35, Math.min(y, rect.height - d.offsetHeight));
                 d.style.left = x + 'px'; d.style.top = y + 'px';
             };
-            const handleEnd = () => { document.removeEventListener('mousemove', handleMove); document.removeEventListener('touchmove', handleMove); };
+            const handleEnd = () => { 
+                document.removeEventListener('mousemove', handleMove); 
+                document.removeEventListener('touchmove', handleMove); 
+            };
             document.addEventListener('mousemove', handleMove);
             document.addEventListener('touchmove', handleMove, {passive: false});
             document.addEventListener('mouseup', handleEnd, {once: true});
             document.addEventListener('touchend', handleEnd, {once: true});
         };
-        d.addEventListener('mousedown', handleStart); d.addEventListener('touchstart', handleStart, {passive: false});
+        d.addEventListener('mousedown', handleStart); 
+        d.addEventListener('touchstart', handleStart, {passive: false});
         document.getElementById('money-layer').appendChild(d);
     }
 
-    function press(v) { if(v === 'C') game.input = ""; else if(game.input.length < 6) game.input += v; update(); }
+    function press(v) { 
+        if(v === 'C') game.input = ""; 
+        else if(game.input.length < 7) game.input += v; 
+        update(); 
+    }
+    
     function update() { 
         document.getElementById('val-ticket').innerText = (game.ticket/100).toFixed(2); 
         document.getElementById('val-recu').innerText = (parseInt(game.input||0)/100).toFixed(2); 
@@ -227,8 +249,11 @@
         game.userRendu = 0; 
         update(); 
     }
+    
     function addRendu(m) { game.userRendu += m.v; spawn(m); }
-    buildDrawer(); init();
+    
+    buildDrawer(); 
+    init();
 </script>
 </body>
 </html>
