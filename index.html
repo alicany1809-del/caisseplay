@@ -3,66 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Caisse Réaliste</title>
+    <title>Caisse Mobile</title>
     <style>
         :root {
-            --bg-app: #3498db; --sidebar: #2c3e50; --plateau: #f8f9fa;
+            --bg-app: #3498db; --sidebar: #2c3e50; --card: #34495e; --plateau: #f8f9fa;
             --m-100: #2ecc71; --m-50: #e67e22; --m-20: #3498db;
             --m-10: #e74c3c; --m-5: #95a5a6; --m-gold: #f1c40f;
             --m-bronze: #d35400; --stroke: #1a252f;
+            --btn-reset: #9b59b6; 
         }
         * { font-size: 1.2rem !important; font-weight: 800; box-sizing: border-box; touch-action: manipulation; }
-        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background: var(--bg-app); font-family: sans-serif; }
-        #game-container { display: flex; flex-direction: column; gap: 8px; height: 100%; padding: 10px; }
-        
-        #top-info { display: grid; grid-template-columns: repeat(3, 1fr) 60px; gap: 8px; }
-        .info-card { background: white; padding: 5px; border-radius: 12px; text-align: center; color: #2c3e50; }
+        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background: var(--bg-app); }
+        body { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; padding: 10px; color: white; position: relative; }
+        #game-container { display: flex; flex-direction: column; gap: 8px; height: 100%; }
+        #header-top { display: flex; gap: 8px; align-items: stretch; flex-shrink: 0; }
+        #top-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; flex-grow: 1; }
+        .info-card { background: #ffffff; padding: 5px; border-radius: 12px; text-align: center; }
         .info-card label { display: block; color: #7f8c8d; font-size: 0.6rem !important; text-transform: uppercase; }
-        
-        .btn-reset { background: #9b59b6; color: white; border: none; border-radius: 12px; box-shadow: 0 4px 0 #8e44ad; cursor: pointer; }
-
-        #plateau-zone { flex-grow: 1; background: var(--plateau); border-radius: 15px; position: relative; border: 3px solid #bdc3c7; overflow: hidden; }
-        #header-step { background: rgba(255,255,255,0.9); padding: 8px; text-align: center; color: var(--sidebar); border-bottom: 2px solid #eee; position: absolute; width: 100%; z-index: 20; }
-        
+        .info-card span { display: block; color: #2c3e50; font-size: 1.1rem !important; }
+        .btn-reset { 
+            background: var(--btn-reset); color: white; border: none; border-radius: 8px;
+            width: 55px; padding: 12px 0; box-shadow: 0 4px 0 #8e44ad; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem !important;
+            position: relative;
+        }
+        .btn-reset:active { transform: translateY(2px); box-shadow: 0 2px 0 #8e44ad; }
+        #plateau-zone { flex-grow: 1; background: var(--plateau); border-radius: 15px; position: relative; overflow: hidden; border: 3px solid #bdc3c7; }
+        #header-step { background: white; padding: 6px; text-align: center; color: var(--sidebar); font-size: 1rem !important; border-bottom: 2px solid #eee; }
         #numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .num-btn, .money-btn { padding: 15px 0; border: none; border-radius: 8px; background: white; color: var(--sidebar); box-shadow: 0 4px 0 #bdc3c7; }
+        .num-btn, .money-btn { padding: 12px 0; border: none; border-radius: 8px; background: white; color: var(--sidebar); cursor: pointer; box-shadow: 0 4px 0 #bdc3c7; position: relative; }
+        .num-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #bdc3c7; }
         .btn-check { background: #2ecc71; color: white; box-shadow: 0 4px 0 #27ae60; }
         .btn-clear { background: #e74c3c; color: white; box-shadow: 0 4px 0 #c0392b; }
-        
-        #drawer { display: none; }
-        .drawer-row { display: flex; gap: 4px; margin-bottom: 4px; }
-        .money-btn { flex: 1; border: 2px solid var(--stroke); color: white; font-size: 0.8rem !important; padding: 10px 0; }
-        
-        .money-item { position: absolute; display: flex; align-items: center; justify-content: center; border: 3px solid var(--stroke); z-index: 10; }
-        .m-billet { width: 90px; height: 45px; border-radius: 6px; }
-        .m-piece { width: 50px; height: 50px; border-radius: 50%; color: var(--stroke); }
-        
+        #drawer { display: none; padding: 5px 0; }
+        .drawer-row { display: flex; gap: 5px; margin-bottom: 5px; }
+        .money-btn { border: 2px solid var(--stroke); color: white; box-shadow: 0 3px 0 var(--stroke); flex: 1; font-size: 0.9rem !important; }
+        .money-item { position: absolute; display: flex; align-items: center; justify-content: center; border: 3px solid var(--stroke); z-index: 10; touch-action: none; }
+        .m-billet { width: 90px; height: 45px; border-radius: 8px; }
+        .m-piece { border-radius: 50%; color: var(--stroke); width: 50px; height: 50px; }
         .c-100 { background: var(--m-100); } .c-50 { background: var(--m-50); } .c-20 { background: var(--m-20); } 
         .c-10 { background: var(--m-10); } .c-5 { background: var(--m-5); } .c-gold { background: var(--m-gold); }
-        .c-silver { background: #ecf0f1; } .c-2e-ring { background: #ecf0f1; border: 4px solid #f1c40f !important; }
+        .c-silver { background: #ecf0f1; border-color: #7f8c8d; } .c-2e-ring { background: #ecf0f1; border: 4px solid #f1c40f !important; }
         .c-bronze { background: var(--m-bronze); color: white; }
-
-        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
-        .shake { animation: shake 0.4s; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        .shake { animation: shake 0.4s ease; }
+        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; visibility: hidden; opacity: 0; transition: opacity 0.4s; }
+        #overlay.show { visibility: visible; opacity: 1; }
     </style>
 </head>
 <body>
 
 <div id="game-container">
-    <div id="top-info">
-        <div class="info-card"><label>A PAYER</label><span id="val-ticket">0.00</span></div>
-        <div class="info-card"><label>REÇU</label><span id="val-recu">0.00</span></div>
-        <div class="info-card"><label>RENDU</label><span id="val-rendre">0.00</span></div>
+    <div id="header-top">
+        <div id="top-info">
+            <div class="info-card"><label>A PAYER</label><span id="val-ticket">0.00</span></div>
+            <div class="info-card"><label>REÇU</label><span id="val-recu">0.00</span></div>
+            <div class="info-card"><label>A RENDRE</label><span id="val-rendre">0.00</span></div>
+        </div>
         <button class="btn-reset" onclick="init()">&#10227;</button>
     </div>
 
     <div id="plateau-zone">
-        <div id="header-step">...</div>
+        <div id="header-step">Chargement...</div>
         <div id="money-layer"></div>
     </div>
 
-    <div id="interactive">
+    <div id="interactive-bottom">
         <div id="numpad">
             <button class="num-btn" onclick="press('1')">1</button>
             <button class="num-btn" onclick="press('2')">2</button>
@@ -75,23 +81,23 @@
             <button class="num-btn" onclick="press('9')">9</button>
             <button class="num-btn btn-clear" onclick="press('C')">C</button>
             <button class="num-btn" onclick="press('0')">0</button>
-            <button class="num-btn btn-check" onclick="checkRecu()">OK</button>
+            <button class="num-btn btn-check" onclick="check()">OK</button>
         </div>
 
         <div id="drawer">
             <div class="drawer-row" id="row-b"></div>
             <div class="drawer-row" id="row-p"></div>
-            <div style="display:flex; gap:8px">
-                <button class="num-btn btn-clear" style="flex:1" onclick="clearPlateau()">EFFACER</button>
-                <button class="num-btn btn-check" style="flex:2" onclick="checkFinal()">TERMINER</button>
+            <div style="display: flex; gap: 10px; margin-top:5px">
+                <button class="num-btn btn-clear" style="flex: 1;" onclick="clearPlateau()">EFFACER</button>
+                <button class="num-btn btn-check" style="flex: 2;" onclick="checkFinal()">TERMINER</button>
             </div>
         </div>
     </div>
 </div>
 
 <div id="overlay">
-    <h1 style="color:white">PARFAIT ! 💰</h1>
-    <button class="num-btn" style="padding:15px 50px" onclick="init()">SUIVANT</button>
+    <h1 style="color:white; margin-bottom:20px">BRAVO ! 🌟</h1>
+    <button class="num-btn" style="padding: 15px 40px; background:#2ecc71; color:white" onclick="init()">JEU SUIVANT</button>
 </div>
 
 <script>
@@ -104,140 +110,124 @@
         {v:5, n:'5c', c:'c-bronze', t:'m-piece'}, {v:2, n:'2c', c:'c-bronze', t:'m-piece'},
         {v:1, n:'1c', c:'c-bronze', t:'m-piece'}
     ];
+    let game = { step: 1, ticket: 0, received: 0, input: "", userRendu: 0 };
 
-    let game = { ticket: 0, received: 0, input: "", userRendu: 0, step: 1 };
+    function buildDrawer() {
+        document.getElementById('row-b').innerHTML = ""; document.getElementById('row-p').innerHTML = "";
+        MONNAIE.forEach(m => {
+            const btn = document.createElement('button');
+            btn.className = `money-btn ${m.c}`; btn.innerText = m.n;
+            btn.onclick = () => { if(game.step === 4) addRendu(m); };
+            document.getElementById(m.t === 'm-billet' ? 'row-b' : 'row-p').appendChild(btn);
+        });
+    }
 
     function init() {
-        // NOUVELLE PLAGE DE PRIX : 0.20€ à 400.00€
-        game = { step: 1, ticket: Math.floor(Math.random() * 39981) + 20, received: 0, input: "", userRendu: 0 };
+        game = { step: 2, ticket: Math.floor(Math.random() * 8500) + 500, received: 0, input: "", userRendu: 0 };
         document.getElementById('money-layer').innerHTML = "";
-        document.getElementById('overlay').style.display = "none";
+        document.getElementById('overlay').classList.remove('show');
         document.getElementById('numpad').style.display = "grid";
         document.getElementById('drawer').style.display = "none";
-        document.getElementById('header-step').innerText = "Combien le client donne-t-il ?";
-        
-        genererPaiementRealiste();
-        updateUI();
-    }
+        document.getElementById('header-step').innerText = "Combien a-t-on reçu ?";
 
-    function genererPaiementRealiste() {
         let s = 0;
-        let objets = [];
-        const centimes = game.ticket % 100;
-        const choix = Math.random();
+        let objetsDonnes = [];
 
-        if (choix < 0.50) { 
-            // 1. PAIEMENT LOGIQUE (Billets suffisant pour couvrir le prix)
-            while (s < game.ticket) {
-                let billet = MONNAIE.find(m => m.v >= (game.ticket - s) && m.t === 'm-billet') || MONNAIE[0];
-                objets.push(billet);
-                s += billet.v;
-                if (choix < 0.25) break; // Un seul gros billet si possible, sinon plusieurs
-            }
-        } 
-        else if (choix < 0.80) {
-            // 2. L'APPOINT (Billet + centimes pile pour éviter la petite monnaie)
-            let tempS = 0;
-            while (tempS < game.ticket) {
-                let billet = MONNAIE.find(m => m.v >= (game.ticket - tempS) && m.t === 'm-billet') || MONNAIE[0];
-                objets.push(billet);
-                tempS += billet.v;
-                break; 
-            }
-            s = tempS + centimes;
-            let reste = centimes;
-            while(reste > 0) {
-                let p = MONNAIE.find(m => m.v <= reste && m.t === 'm-piece');
-                objets.push(p); reste -= p.v;
-            }
-        } 
-        else {
-            // 3. PETITS BILLETS + PIÈCES
-            let cible = game.ticket;
-            while (s < cible) {
-                let m = MONNAIE[Math.floor(Math.random() * 6) + 2]; // 20€ à 1€
-                s += m.v; objets.push(m);
-            }
+        // Étape 1 : Le client donne de quoi couvrir la majorité du prix avec des billets/pièces logiques
+        while (s < game.ticket - 500) { // On s'arrête 5€ avant pour forcer des petites pièces
+            let m = MONNAIE.filter(x => x.v <= (game.ticket - s + 2000))[Math.floor(Math.random() * 3)]; 
+            if(!m) m = MONNAIE[4];
+            s += m.v;
+            objetsDonnes.push(m);
         }
 
-        // Ajout aléatoire d'une petite pièce de fond de poche (1c, 2c, 5c)
-        if(Math.random() > 0.6) {
-            let petite = MONNAIE[Math.floor(Math.random() * 3) + 10];
-            s += petite.v; objets.push(petite);
+        // Étape 2 : On complète pour dépasser le prix avec beaucoup de petits objets (4 à 8 au total)
+        while (objetsDonnes.length < 6 || s < game.ticket) {
+            let reste = game.ticket - s;
+            let m;
+            if (reste > 0) {
+                // Doit donner plus pour payer
+                m = MONNAIE[Math.floor(Math.random() * 5) + 6]; // Pièces de 2€ à 10c
+            } else {
+                // A déjà assez payé mais donne quand même des petites pièces (le client vide son porte-monnaie)
+                m = MONNAIE[Math.floor(Math.random() * 4) + 9]; // Pièces de 10c à 1c
+            }
+            s += m.v;
+            objetsDonnes.push(m);
+            if(objetsDonnes.length >= 8) break; 
         }
 
-        game.received = s;
-        objets.forEach(m => spawn(m, true));
+        objetsDonnes.forEach(m => spawn(m));
+        game.received = s; 
+        update();
     }
 
-    function spawn(m, auto) {
+    function spawn(m) {
         const d = document.createElement('div');
-        d.className = `money-item ${m.t} ${m.c}`; d.innerText = m.n;
-        d.style.left = (Math.random() * 60 + 10) + "%";
-        d.style.top = (Math.random() * 50 + 20) + "%";
-        
-        d.onmousedown = d.ontouchstart = (e) => {
-            const move = (ev) => {
-                const touch = ev.touches ? ev.touches[0] : ev;
-                d.style.left = (touch.clientX - 40) + "px"; d.style.top = (touch.clientY - 20) + "px";
+        d.className = `money-item ${m.t} ${m.c}`; d.innerText = m.n; 
+        d.style.left = (Math.random() * 60 + 10) + "%"; d.style.top = (Math.random() * 40 + 20) + "%";
+        const handleStart = (e) => {
+            const rect = document.getElementById('plateau-zone').getBoundingClientRect();
+            const touch = e.touches ? e.touches[0] : e;
+            let sx = touch.clientX - d.getBoundingClientRect().left;
+            let sy = touch.clientY - d.getBoundingClientRect().top;
+            const handleMove = (ev) => {
+                const t = ev.touches ? ev.touches[0] : ev;
+                let x = t.clientX - rect.left - sx;
+                let y = t.clientY - rect.top - sy;
+                x = Math.max(0, Math.min(x, rect.width - d.offsetWidth));
+                y = Math.max(35, Math.min(y, rect.height - d.offsetHeight));
+                d.style.left = x + 'px'; d.style.top = y + 'px';
             };
-            document.onmousemove = document.ontouchmove = move;
-            document.onmouseup = document.ontouchend = () => document.onmousemove = document.ontouchmove = null;
+            const handleEnd = () => { document.removeEventListener('mousemove', handleMove); document.removeEventListener('touchmove', handleMove); };
+            document.addEventListener('mousemove', handleMove);
+            document.addEventListener('touchmove', handleMove, {passive: false});
+            document.addEventListener('mouseup', handleEnd, {once: true});
+            document.addEventListener('touchend', handleEnd, {once: true});
         };
+        d.addEventListener('mousedown', handleStart); d.addEventListener('touchstart', handleStart, {passive: false});
         document.getElementById('money-layer').appendChild(d);
     }
 
-    function press(v) { 
-        if(v === 'C') game.input = ""; 
-        else if(game.input.length < 7) game.input += v; 
-        updateUI(); 
+    function press(v) { if(v === 'C') game.input = ""; else if(game.input.length < 6) game.input += v; update(); }
+    function update() { 
+        document.getElementById('val-ticket').innerText = (game.ticket/100).toFixed(2); 
+        document.getElementById('val-recu').innerText = (parseInt(game.input||0)/100).toFixed(2); 
+        let cibleARendre = (game.received - game.ticket);
+        document.getElementById('val-rendre').innerText = (game.step >= 4) ? (cibleARendre/100).toFixed(2) : "0.00";
     }
 
-    function updateUI() {
-        document.getElementById('val-ticket').innerText = (game.ticket/100).toFixed(2);
-        document.getElementById('val-recu').innerText = (parseInt(game.input||0)/100).toFixed(2);
-        let renduCible = (game.received - game.ticket) / 100;
-        document.getElementById('val-rendre').innerText = game.step === 2 ? renduCible.toFixed(2) : "0.00";
-    }
-
-    function checkRecu() {
-        if(parseInt(game.input) === game.received) {
-            game.step = 2;
+    function check() {
+        if(parseInt(game.input) === game.received) { 
+            game.step = 4;
             document.getElementById('header-step').innerText = "Rendez la monnaie !";
             document.getElementById('money-layer').innerHTML = "";
             document.getElementById('numpad').style.display = "none";
             document.getElementById('drawer').style.display = "block";
-            updateUI();
-        } else { feedback(false); }
+            update(); feedback(true);
+        } else feedback(false);
     }
 
-    function checkFinal() {
+    function checkFinal() { 
         if(Math.round(game.userRendu) === (game.received - game.ticket)) {
-            document.getElementById('overlay').style.display = "flex";
-        } else { feedback(false); }
+            document.getElementById('overlay').classList.add('show');
+            feedback(true);
+        } else feedback(false);
     }
 
     function feedback(win) {
-        const p = document.getElementById('plateau-zone');
+        const p = document.getElementById('plateau-zone'); 
         p.classList.add('shake');
-        p.style.background = win ? '#2ecc71' : '#e74c3c';
-        setTimeout(() => { p.classList.remove('shake'); p.style.background = 'var(--plateau)'; }, 500);
+        p.style.backgroundColor = win ? '#2ecc71' : '#e74c3c';
+        setTimeout(() => { p.classList.remove('shake'); p.style.backgroundColor = 'var(--plateau)'; }, 500); 
     }
 
-    function clearPlateau() { document.getElementById('money-layer').innerHTML = ""; game.userRendu = 0; }
-    function addRendu(m) { game.userRendu += m.v; spawn(m, false); }
-
-    function buildDrawer() {
-        document.getElementById('row-b').innerHTML = "";
-        document.getElementById('row-p').innerHTML = "";
-        MONNAIE.forEach(m => {
-            const b = document.createElement('button');
-            b.className = `money-btn ${m.c}`; b.innerText = m.n;
-            b.onclick = () => addRendu(m);
-            document.getElementById(m.t === 'm-billet' ? 'row-b' : 'row-p').appendChild(b);
-        });
+    function clearPlateau() { 
+        document.getElementById('money-layer').innerHTML = ""; 
+        game.userRendu = 0; 
+        update(); 
     }
-
+    function addRendu(m) { game.userRendu += m.v; spawn(m); }
     buildDrawer(); init();
 </script>
 </body>
