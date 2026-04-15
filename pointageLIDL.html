@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pointage Lidl - Alican YESILKAYA</title>
+    <style>
+        :root { --lidl-blue: #0050aa; --lidl-yellow: #fff000; --lidl-red: #e2001a; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; text-align: center; padding: 15px; margin: 0; }
+        .container { background: white; max-width: 400px; margin: auto; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 8px solid var(--lidl-blue); }
+        .user-info { background: #f8f9fa; padding: 10px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; color: #333; border: 1px solid #ddd; }
+        h1 { color: var(--lidl-blue); font-size: 24px; margin-top: 0; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        button { padding: 18px 10px; font-size: 15px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; transition: transform 0.1s, opacity 0.2s; }
+        button:active { transform: scale(0.95); }
+        .btn-work { background: var(--lidl-blue); color: white; }
+        .btn-pause { background: var(--lidl-yellow); color: #000; }
+        .btn-end { background: var(--lidl-red); color: white; grid-column: span 2; margin-top: 5px; }
+        .share-section { margin-top: 25px; border-top: 1px dashed #ccc; padding-top: 20px; }
+        h3 { font-size: 16px; color: #666; }
+        .btn-share { width: 100%; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .whatsapp { background: #25D366; color: white; }
+        .email { background: #444; color: white; }
+        .status { margin-top: 10px; font-size: 12px; color: #28a745; font-weight: bold; min-height: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>LIDL Pointage</h1>
+    
+    <div class="user-info">
+        <strong>Employé :</strong> YESILKAYA Alican<br>
+        <strong>ID :</strong> 17360680
+    </div>
+    
+    <div class="grid">
+        <button class="btn-work" onclick="sendData('DÉBUT TRAVAIL')">▶ Début Travail</button>
+        <button class="btn-pause" onclick="sendData('DÉBUT PAUSE')">☕ Début Pause</button>
+        <button class="btn-pause" onclick="sendData('FIN PAUSE')) ">✅ Fin Pause</button>
+        <button class="btn-work" onclick="sendData('FIN TRAVAIL')">🏁 Fin Travail</button>
+        <button class="btn-end" onclick="sendData('JOURNÉE TERMINÉE')">🚀 Fin de Journée</button>
+    </div>
+
+    <div id="statusLabel" class="status"></div>
+
+    <div class="share-section">
+        <h3>📤 Partager mon pointage</h3>
+        <button class="btn-share whatsapp" onclick="share('whatsapp')">WhatsApp</button>
+        <button class="btn-share email" onclick="share('email')">Gmail / Email</button>
+    </div>
+</div>
+
+<script>
+    // --- CONFIGURATION ---
+    const SCRIPT_URL = "TON_URL_GOOGLE_SCRIPT"; // Remplacer par l'URL de ton script Google
+    const USER_NAME = "YESILKAYA Alican";
+    const USER_ID = "17360680";
+    
+    let lastLogMessage = "";
+
+    function sendData(type) {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        const dateStr = now.toLocaleDateString('fr-FR');
+        
+        lastLogMessage = `Pointage LIDL\nEmployé: ${USER_NAME} (${USER_ID})\nDate: ${dateStr}\nAction: ${type}\nHeure: ${timeStr}`;
+
+        const statusLabel = document.getElementById('statusLabel');
+        statusLabel.innerText = "⏳ Enregistrement en cours...";
+        statusLabel.style.color = "#ffc107";
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({ 
+                time: timeStr, 
+                type: type, 
+                name: USER_NAME, 
+                employeeId: USER_ID 
+            })
+        }).then(() => {
+            statusLabel.innerText = "✅ Enregistré avec succès !";
+            statusLabel.style.color = "#28a745";
+            setTimeout(() => { statusLabel.innerText = ""; }, 3000);
+        }).catch(err => {
+            statusLabel.innerText = "❌ Erreur de connexion";
+            statusLabel.style.color = "#dc3545";
+        });
+    }
+
+    function share(platform) {
+        if (!lastLogMessage) {
+            alert("Veuillez d'abord cliquer sur un bouton de pointage.");
+            return;
+        }
+        const text = encodeURIComponent(lastLogMessage);
+        if (platform === 'whatsapp') {
+            window.open(`https://wa.me/?text=${text}`);
+        } else {
+            window.location.href = `mailto:?subject=Pointage Lidl - ${USER_NAME}&body=${text}`;
+        }
+    }
+</script>
+
+</body>
+</html>
