@@ -3,105 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pointage Lidl - Alican YESILKAYA</title>
+    <title>Bingo - Images Aléatoires</title>
     <style>
-        :root { --lidl-blue: #0050aa; --lidl-yellow: #fff000; --lidl-red: #e2001a; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; text-align: center; padding: 15px; margin: 0; }
-        .container { background: white; max-width: 400px; margin: auto; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 8px solid var(--lidl-blue); }
-        .user-info { background: #f8f9fa; padding: 10px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; color: #333; border: 1px solid #ddd; }
-        h1 { color: var(--lidl-blue); font-size: 24px; margin-top: 0; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        button { padding: 18px 10px; font-size: 15px; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; transition: transform 0.1s, opacity 0.2s; }
-        button:active { transform: scale(0.95); }
-        .btn-work { background: var(--lidl-blue); color: white; }
-        .btn-pause { background: var(--lidl-yellow); color: #000; }
-        .btn-end { background: var(--lidl-red); color: white; grid-column: span 2; margin-top: 5px; }
-        .share-section { margin-top: 25px; border-top: 1px dashed #ccc; padding-top: 20px; }
-        h3 { font-size: 16px; color: #666; }
-        .btn-share { width: 100%; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .whatsapp { background: #25D366; color: white; }
-        .email { background: #444; color: white; }
-        .status { margin-top: 10px; font-size: 12px; color: #28a745; font-weight: bold; min-height: 15px; }
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .main-container {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        #info-text {
+            font-size: 1.2rem;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .image-box {
+            width: 400px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f0f2f5;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px dashed #dcdde1;
+        }
+
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+
+        /* Animation d'apparition cool (Fondu + Zoom) */
+        @keyframes appearAnimation {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) rotate(-3deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .animate {
+            animation: appearAnimation 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        button {
+            cursor: pointer;
+            padding: 12px 24px;
+            font-size: 1rem;
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3);
+        }
+
+        button:hover {
+            background-color: #ff6b81;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 71, 87, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>LIDL Pointage</h1>
-    
-    <div class="user-info">
-        <strong>Employé :</strong> YESILKAYA Alican<br>
-        <strong>ID :</strong> 17360680
-    </div>
-    
-    <div class="grid">
-        <button class="btn-work" onclick="sendData('DÉBUT TRAVAIL')">▶ Début Travail</button>
-        <button class="btn-pause" onclick="sendData('DÉBUT PAUSE')">☕ Début Pause</button>
-        <button class="btn-pause" onclick="sendData('FIN PAUSE')) ">✅ Fin Pause</button>
-        <button class="btn-work" onclick="sendData('FIN TRAVAIL')">🏁 Fin Travail</button>
-        <button class="btn-end" onclick="sendData('JOURNÉE TERMINÉE')">🚀 Fin de Journée</button>
-    </div>
-
-    <div id="statusLabel" class="status"></div>
-
-    <div class="share-section">
-        <h3>📤 Partager mon pointage</h3>
-        <button class="btn-share whatsapp" onclick="share('whatsapp')">WhatsApp</button>
-        <button class="btn-share email" onclick="share('email')">Gmail / Email</button>
-    </div>
-</div>
-
-<script>
-    // --- CONFIGURATION ---
-    const SCRIPT_URL = "TON_URL_GOOGLE_SCRIPT"; // Remplacer par l'URL de ton script Google
-    const USER_NAME = "YESILKAYA Alican";
-    const USER_ID = "17360680";
-    
-    let lastLogMessage = "";
-
-    function sendData(type) {
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-        const dateStr = now.toLocaleDateString('fr-FR');
+    <div class="main-container">
+        <p id="info-text">Cliquez n'importe où sur la page pour afficher une image</p>
         
-        lastLogMessage = `Pointage LIDL\nEmployé: ${USER_NAME} (${USER_ID})\nDate: ${dateStr}\nAction: ${type}\nHeure: ${timeStr}`;
+        <!-- Conteneur de l'image -->
+        <div class="image-box">
+            <img id="displayed-image" src="" alt="Image aléatoire">
+        </div>
 
-        const statusLabel = document.getElementById('statusLabel');
-        statusLabel.innerText = "⏳ Enregistrement en cours...";
-        statusLabel.style.color = "#ffc107";
+        <!-- Bouton pour recommencer à zéro -->
+        <button id="reset-btn">Recommencer de zéro</button>
+    </div>
 
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({ 
-                time: timeStr, 
-                type: type, 
-                name: USER_NAME, 
-                employeeId: USER_ID 
-            })
-        }).then(() => {
-            statusLabel.innerText = "✅ Enregistré avec succès !";
-            statusLabel.style.color = "#28a745";
-            setTimeout(() => { statusLabel.innerText = ""; }, 3000);
-        }).catch(err => {
-            statusLabel.innerText = "❌ Erreur de connexion";
-            statusLabel.style.color = "#dc3545";
+    <script>
+        const imagesList = [
+            "https://i.ibb.co/Fb2rTV48/image.png", "https://i.ibb.co/0j1pjPvr/image.png",
+            "https://i.ibb.co/DH6cxH4C/image.png", "https://i.ibb.co/0jXJN568/image.png",
+            "https://i.ibb.co/H6MrMR4/image.png", "https://i.ibb.co/5WXFHLpB/image.png",
+            "https://i.ibb.co/wN9S8B5f/image.png", "https://i.ibb.co/zV7BSXcJ/image.png",
+            "https://i.ibb.co/xtcvD00W/image.png", "https://i.ibb.co/PzDn3TyJ/image.png",
+            "https://i.ibb.co/vbtxCF9/image.png", "https://i.ibb.co/5gZCYKpq/image.png",
+            "https://i.ibb.co/TDxRXsWX/image.png", "https://i.ibb.co/k6rMDHxP/image.png",
+            "https://i.ibb.co/9knwxY17/image.png", "https://i.ibb.co/TMxww3Gq/image.png",
+            "https://i.ibb.co/dsNPhv7r/image.png", "https://i.ibb.co/C3wJJBw8/image.png",
+            "https://i.ibb.co/rGqhccDF/image.png", "https://i.ibb.co/hJKjnp36/image.png",
+            "https://i.ibb.co/Y408cW3m/image.png", "https://i.ibb.co/QjhMWhZv/image.png",
+            "https://i.ibb.co/hJqHgXrR/image.png", "https://i.ibb.co/b5TvZwfg/image.png",
+            "https://i.ibb.co/pvWr8vqK/image.png", "https://i.ibb.co/wNDm3FyP/image.png",
+            "https://i.ibb.co/TxNzzHcp/image.png", "https://i.ibb.co/cK40q7nT/image.png",
+            "https://i.ibb.co/ychTbn8N/image.png", "https://i.ibb.co/tPqSY8yw/image.png",
+            "https://i.ibb.co/bgwmrdCX/image.png", "https://i.ibb.co/JTKtCJb/image.png",
+            "https://i.ibb.co/Fk5nX8c9/image.png", "https://i.ibb.co/1JZMpHjG/image.png",
+            "https://i.ibb.co/0znChyD/image.png", "https://i.ibb.co/Y4352c96/image.png",
+            "https://i.ibb.co/SwCHmvyv/image.png", "https://i.ibb.co/7dyBQWj4/image.png",
+            "https://i.ibb.co/rfNZ45qb/image.png", "https://i.ibb.co/cVfbCrC/image.png",
+            "https://i.ibb.co/bMFrtvNg/image.png", "https://i.ibb.co/HTBTNf9q/image.png",
+            "https://i.ibb.co/MD4mRTyh/image.png", "https://i.ibb.co/SXmbN2rR/image.png",
+            "https://i.ibb.co/TDGC87M0/image.png", "https://i.ibb.co/n8gKWHM2/image.png",
+            "https://i.ibb.co/NgbmsYJY/image.png", "https://i.ibb.co/KzV0xcFy/image.png",
+            "https://i.ibb.co/4RkP6hNF/image.png", "https://i.ibb.co/qFP3KJxZ/image.png",
+            "https://i.ibb.co/wZdScRcY/image.png", "https://i.ibb.co/ks5VcgZb/image.png",
+            "https://i.ibb.co/PsjS5SmK/image.png", "https://i.ibb.co/spN0jMXs/image.png",
+            "https://i.ibb.co/wNcx01WQ/image.png", "https://i.ibb.co/V0ntGBsV/image.png",
+            "https://i.ibb.co/My1VmvRj/image.png", "https://i.ibb.co/Ldjkxb9k/image.png",
+            "https://i.ibb.co/hRYzJnDr/image.png", "https://i.ibb.co/chqGytSB/image.png",
+            "https://i.ibb.co/bRqm5PHD/image.png", "https://i.ibb.co/TBqTKwS6/image.png",
+            "https://i.ibb.co/FqKq0fw8/image.png", "https://i.ibb.co/93C0mJVj/image.png",
+            "https://i.ibb.co/B5KpdHpJ/image.png", "https://i.ibb.co/bRbV1D8R/image.png",
+            "https://i.ibb.co/4wR7KxTM/image.png", "https://i.ibb.co/XrMsnJqC/image.png",
+            "https://i.ibb.co/HL8PG6Hj/image.png", "https://i.ibb.co/Rps74m6p/image.png",
+            "https://i.ibb.co/ycYZdKZ6/image.png", "https://i.ibb.co/svtLQMYs/image.png",
+            "https://i.ibb.co/sJp2FxBN/image.png", "https://i.ibb.co/PvXNW44y/image.png",
+            "https://i.ibb.co/0R9MD0DM/image.png", "https://i.ibb.co/ds6tcJVj/image.png",
+            "https://i.ibb.co/cX1qPbMC/image.png", "https://i.ibb.co/gFwphG6w/image.png",
+            "https://i.ibb.co/SwvYgBkw/image.png", "https://i.ibb.co/9H2kGC4Q/image.png",
+            "https://i.ibb.co/C58xzJh9/image.png", "https://i.ibb.co/TM66ngGv/image.png",
+            "https://i.ibb.co/nsSCSb3y/image.png", "https://i.ibb.co/ZRGJxfwt/image.png",
+            "https://i.ibb.co/dCPMJth/image.png", "https://i.ibb.co/BHgV9HwV/image.png",
+            "https://i.ibb.co/rKKVGPNf/image.png", "https://i.ibb.co/gLgq5G0p/image.png",
+            "https://i.ibb.co/p6tZC7cp/image.png", "https://i.ibb.co/b5P21ZyC/image.png",
+            "https://i.ibb.co/0prZ7gbV/image.png", "https://i.ibb.co/Dn8gKKY/image.png",
+            "https://i.ibb.co/MDBy9GQ9/image.png", "https://i.ibb.co/HLWm9jGD/image.png",
+            "https://i.ibb.co/yFXvCwkQ/image.png", "https://i.ibb.co/354xb914/image.png",
+            "https://i.ibb.co/k2zbQSkV/image.png", "https://i.ibb.co/XZrGbJqZ/image.png",
+            "https://i.ibb.co/v6HBLWNd/image.png", "https://i.ibb.co/bgFsnpcy/image.png"
+        ];
+
+        let remainingImages = [];
+        let currentIndex = 0;
+
+        const imgElement = document.getElementById("displayed-image");
+        const infoText = document.getElementById("info-text");
+        const resetBtn = document.getElementById("reset-btn");
+
+        function shuffle(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function initGame() {
+            remainingImages = shuffle(imagesList);
+            currentIndex = 0;
+            imgElement.style.display = "none";
+            imgElement.classList.remove("animate");
+            infoText.textContent = "Cliquez n'importe où sur la page pour commencer !";
+        }
+
+        initGame();
+
+        document.body.addEventListener("click", (event) => {
+            if (event.target === resetBtn) return;
+
+            if (currentIndex < remainingImages.length) {
+                // Retire l'animation pour pouvoir la relancer à chaque clic
+                imgElement.classList.remove("animate");
+                
+                // Change l'image
+                imgElement.src = remainingImages[currentIndex];
+                imgElement.style.display = "block";
+                
+                // Force le navigateur à relancer l'animation (reflow)
+                void imgElement.offsetWidth;
+                imgElement.classList.add("animate");
+
+                infoText.textContent = `Image ${currentIndex + 1} sur ${imagesList.length}`;
+                currentIndex++;
+            } else {
+                infoText.textContent = "Toutes les images ont été affichées ! Cliquez sur 'Recommencer de zéro'.";
+            }
         });
-    }
 
-    function share(platform) {
-        if (!lastLogMessage) {
-            alert("Veuillez d'abord cliquer sur un bouton de pointage.");
-            return;
-        }
-        const text = encodeURIComponent(lastLogMessage);
-        if (platform === 'whatsapp') {
-            window.open(`https://wa.me/?text=${text}`);
-        } else {
-            window.location.href = `mailto:?subject=Pointage Lidl - ${USER_NAME}&body=${text}`;
-        }
-    }
-</script>
+        resetBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            initGame();
+        });
+    </script>
 
 </body>
 </html>
